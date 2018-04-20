@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MallBeacon</string>
+    <string name="action_settings">Settings</string>
+    <string name="textview">TextView</string>
+    <string name="location_warning_title">Permissions Warning.</string>
+    <string name="location_warning">MayMallBeacon would not be able to show you offers while its in the background.</string>
+    <string name="permission_granted">Location permission granted</string>
+</resources>

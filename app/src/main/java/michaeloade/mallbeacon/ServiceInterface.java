@@ -16,7 +16,9 @@ import retrofit2.http.POST;
 public interface ServiceInterface {
     @FormUrlEncoded
     @POST("/beep")
-    Call<Visit> beep(@Field("target") String target);
+    Call<Visit> beep(@Field("beacon") String target,
+                     @Field("distance") int distance,
+                     @Field("user") String user);
 
     @FormUrlEncoded
     @POST("/auth/register")

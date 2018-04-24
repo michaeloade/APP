@@ -32,8 +32,8 @@ public class MallService {
         return _MallInstance;
     }
 
-    public Call<Visit> beep(String target) {
-        return service.beep(target);
+    public Call<Visit> beep(String target, int distance, String user) {
+        return service.beep(target, distance, user);
     }
 
     public Call<User> login(String username, String password) {

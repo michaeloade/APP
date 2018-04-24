@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.ListActivity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -46,11 +47,14 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
     private HashSet<Beacon> beaconHashSet;
     private ArrayAdapter<Beacon> beaconAdapter;
     private ListView listView;
-    private ServiceInterface service;
+    private MallService mallService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent intent = new Intent(this, LoginActivity.class);
+        mallService = MallService.getInstance(this);
+        startActivity(intent);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -59,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Sign up to our news letter", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -85,13 +89,6 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
                 .beacon_item, beaconList);
         listView = findViewById(R.id.listView);
         listView.setAdapter(beaconAdapter);
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://beaconsapp.com/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        service = retrofit.create(ServiceInterface.class);
 
         //Initialise and parse beacons
         beaconManager = BeaconManager.getInstanceForApplication(this);
@@ -160,23 +157,23 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
         beaconManager.addMonitorNotifier(new MonitorNotifier() {
             @Override
             public void didEnterRegion(Region region) {
-                service.beep("1234");
-                Log.i(TAG, "I just saw an beacon for the first time!");
+                mallService.beep(region.getUniqueId());
+                Log.i(TAG, "New beacon detected!");
             }
 
             @Override
             public void didExitRegion(Region region) {
-                Log.i(TAG, "I no longer see an beacon");
+                Log.i(TAG, "Beacon no longer in range");
             }
 
             @Override
             public void didDetermineStateForRegion(int state, Region region) {
-                Log.i(TAG, "I have just switched from seeing/not seeing beacons: " + state);
+                Log.i(TAG, "State changed: " + state);
             }
         });
 
         try {
-            beaconManager.startMonitoringBeaconsInRegion(new Region("myMonitoringUniqueId", null, null, null));
+            beaconManager.startMonitoringBeaconsInRegion(new Region("monitoringId", null, null, null));
         } catch (RemoteException e) {
         }
 
@@ -188,13 +185,13 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
                     beaconList.clear();
                     beaconList.addAll(beaconHashSet);
                     beaconAdapter.notifyDataSetChanged();
-                    Log.i(TAG, "The beacon I saw " + beacons.iterator().next().getId1() + " is about " + beacons.iterator().next().getId2() + " meters away.");
+                    Log.i(TAG, "Beacon detected: " + beacons.iterator().next().getId1() + " about " + beacons.iterator().next().getId2() + " meters away.");
                 }
             }
         });
 
         try {
-            beaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
+            beaconManager.startRangingBeaconsInRegion(new Region("rangingId", null, null, null));
         } catch (RemoteException e) {
         }
     }
